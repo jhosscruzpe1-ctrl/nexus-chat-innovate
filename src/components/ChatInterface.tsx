@@ -157,14 +157,14 @@ Estoy aquí para ayudarte con:
   return (
     <div className="flex flex-col h-full w-full bg-background">
       {/* Header */}
-      <div className="bg-gradient-to-r from-primary to-secondary p-4 text-primary-foreground">
-        <h2 className="text-lg font-bold">💬 Asistente Virtual</h2>
-        <p className="text-xs opacity-90">Municipalidad de Morropón - Chulucanas</p>
+      <div className="bg-gradient-to-r from-primary to-secondary p-4 sm:p-6 text-primary-foreground pr-12 sm:pr-14">
+        <h2 className="text-base sm:text-lg font-bold truncate">💬 Asistente Virtual</h2>
+        <p className="text-xs opacity-90 truncate">Municipalidad de Morropón - Chulucanas</p>
       </div>
 
       {/* Messages */}
-      <ScrollArea className="flex-1 p-4" ref={scrollRef}>
-        <div className="space-y-4">
+      <ScrollArea className="flex-1 p-3 sm:p-4" ref={scrollRef}>
+        <div className="space-y-3 sm:space-y-4">
           {messages.map((message, index) => (
             <ChatMessage
               key={index}
@@ -175,8 +175,8 @@ Estoy aquí para ayudarte con:
           ))}
           {isLoading && (
             <div className="flex items-center justify-start">
-              <div className="bg-card rounded-2xl px-4 py-3 shadow-md border border-border">
-                <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+              <div className="bg-card rounded-2xl px-3 py-2 sm:px-4 sm:py-3 shadow-md border border-border">
+                <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 animate-spin text-muted-foreground" />
               </div>
             </div>
           )}
@@ -184,30 +184,30 @@ Estoy aquí para ayudarte con:
       </ScrollArea>
 
       {/* Input */}
-      <div className="p-4 bg-background/80 backdrop-blur-sm border-t border-border">
+      <div className="p-3 sm:p-4 bg-background/80 backdrop-blur-sm border-t border-border">
         <div className="flex gap-2">
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder="Escribe tu consulta aquí..."
+            placeholder="Escribe tu consulta..."
             disabled={isLoading}
-            className="flex-1 rounded-xl border-border focus:border-primary transition-colors duration-300"
+            className="flex-1 rounded-xl border-border focus:border-primary transition-colors duration-300 text-sm h-9 sm:h-10"
           />
           <Button
             onClick={handleSend}
             disabled={!input.trim() || isLoading}
-            className="bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 transition-all duration-300 rounded-xl px-6"
+            className="bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 transition-all duration-300 rounded-xl px-4 sm:px-6 h-9 sm:h-10 flex-shrink-0"
           >
             {isLoading ? (
-              <Loader2 className="h-5 w-5 animate-spin" />
+              <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 animate-spin" />
             ) : (
-              <Send className="h-5 w-5" />
+              <Send className="h-4 w-4 sm:h-5 sm:w-5" />
             )}
           </Button>
         </div>
-        <p className="text-xs text-muted-foreground mt-2 text-center">
-          Presiona Enter para enviar • Shift + Enter para nueva línea
+        <p className="text-[10px] sm:text-xs text-muted-foreground mt-1 sm:mt-2 text-center hidden sm:block">
+          Presiona Enter para enviar
         </p>
       </div>
     </div>
