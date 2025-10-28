@@ -146,17 +146,19 @@ serve(async (req) => {
         throw new Error('LOVABLE_API_KEY not configured');
       }
       
+      const systemPrompt = `Eres un asistente virtual amigable de la Municipalidad Provincial de Morropón - Chulucanas.
+
+📍 Dirección: Jirón Cusco 421, Chulucanas 20301
+📞 Central: +51 965 468 438
+✉️ alcaldia@munichulucanas.gob.pe
+🌐 www.munichulucanas.gob.pe
+⏰ Lunes-Viernes 8:00-16:30
+
+Usa emojis y **negritas** para resaltar. Responde brevemente.`;
+
       const messages = [
-        {
-          role: 'system',
-          content: `Eres un asistente virtual de la Municipalidad Provincial de Morropón - Chulucanas en Perú. 
-Tu trabajo es ayudar a los ciudadanos con información sobre trámites municipales, horarios, ubicación y servicios.
-Sé amable, profesional y conciso. Si no sabes algo, recomienda que se acerquen a la municipalidad o llamen.
-Los principales trámites son: licencias de funcionamiento, partidas de nacimiento, pagos de impuesto predial, y licencias de construcción.
-Horario de atención: Lunes a Viernes 8:00-17:00, Sábados 8:00-13:00.
-Ubicación: Plaza de Armas de Chulucanas.`
-        },
-        ...(history || []).slice(-5), // Últimos 5 mensajes de contexto
+        { role: 'system', content: systemPrompt },
+        ...(history || []).slice(-5),
         { role: 'user', content: message }
       ];
       

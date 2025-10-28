@@ -14,11 +14,11 @@ interface Message {
 }
 
 interface ChatInterfaceProps {
-  userId: string;
-  userName: string;
+  userId?: string;
+  userName?: string;
 }
 
-export const ChatInterface = ({ userId, userName }: ChatInterfaceProps) => {
+export const ChatInterface = ({ userId, userName = "Usuario" }: ChatInterfaceProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -42,32 +42,43 @@ export const ChatInterface = ({ userId, userName }: ChatInterfaceProps) => {
 
   const initializeConversation = async () => {
     try {
-      // Crear nueva conversación
-      const { data, error } = await supabase
-        .from('conversaciones')
-        .insert([{ usuario_id: userId }])
-        .select()
-        .single();
+      // Solo crear conversación si hay userId
+      if (userId) {
+        const { data, error } = await supabase
+          .from('conversaciones')
+          .insert([{ usuario_id: userId }])
+          .select()
+          .single();
 
-      if (error) throw error;
+        if (error) throw error;
+        setConversationId(data.id);
+      }
 
-      setConversationId(data.id);
-
-      // Mensaje de bienvenida
+      // Mensaje de bienvenida mejorado con emojis
       const welcomeMessage: Message = {
         role: 'assistant',
-        content: `¡Hola ${userName}! Soy el asistente virtual de la Municipalidad Provincial de Morropón - Chulucanas. Estoy aquí para ayudarte con información sobre trámites y servicios municipales. ¿En qué puedo ayudarte hoy?`,
+        content: `¡Hola! 👋 Soy tu asistente virtual de la **Municipalidad Provincial de Morropón - Chulucanas**. 
+
+Estoy aquí para ayudarte con:
+📄 Información sobre trámites y servicios
+📍 Datos de contacto y ubicación
+⏰ Horarios de atención
+🔗 Enlaces útiles
+
+¿En qué puedo ayudarte hoy? 😊`,
         timestamp: new Date()
       };
 
       setMessages([welcomeMessage]);
 
-      // Guardar mensaje de bienvenida
-      await supabase.from('mensajes').insert({
-        conversacion_id: data.id,
-        rol: 'assistant',
-        contenido: welcomeMessage.content,
-      });
+      // Guardar mensaje de bienvenida solo si hay conversación
+      if (conversationId) {
+        await supabase.from('mensajes').insert({
+          conversacion_id: conversationId,
+          rol: 'assistant',
+          contenido: welcomeMessage.content,
+        });
+      }
 
     } catch (error) {
       console.error('Error al inicializar conversación:', error);
@@ -80,7 +91,7 @@ export const ChatInterface = ({ userId, userName }: ChatInterfaceProps) => {
   };
 
   const handleSend = async () => {
-    if (!input.trim() || !conversationId) return;
+    if (!input.trim()) return;
 
     const userMessage: Message = {
       role: 'user',
@@ -144,15 +155,15 @@ export const ChatInterface = ({ userId, userName }: ChatInterfaceProps) => {
   };
 
   return (
-    <div className="flex flex-col h-full w-full max-w-4xl mx-auto bg-card/50 backdrop-blur-sm rounded-3xl shadow-elegant border border-border overflow-hidden">
+    <div className="flex flex-col h-full w-full bg-background">
       {/* Header */}
-      <div className="bg-gradient-to-r from-primary to-secondary p-6 text-primary-foreground">
-        <h2 className="text-2xl font-bold">Chat de Atención</h2>
-        <p className="text-sm opacity-90">Municipalidad de Morropón - Chulucanas</p>
+      <div className="bg-gradient-to-r from-primary to-secondary p-4 text-primary-foreground">
+        <h2 className="text-lg font-bold">💬 Asistente Virtual</h2>
+        <p className="text-xs opacity-90">Municipalidad de Morropón - Chulucanas</p>
       </div>
 
       {/* Messages */}
-      <ScrollArea className="flex-1 p-6" ref={scrollRef}>
+      <ScrollArea className="flex-1 p-4" ref={scrollRef}>
         <div className="space-y-4">
           {messages.map((message, index) => (
             <ChatMessage
@@ -173,7 +184,7 @@ export const ChatInterface = ({ userId, userName }: ChatInterfaceProps) => {
       </ScrollArea>
 
       {/* Input */}
-      <div className="p-6 bg-background/80 backdrop-blur-sm border-t border-border">
+      <div className="p-4 bg-background/80 backdrop-blur-sm border-t border-border">
         <div className="flex gap-2">
           <Input
             value={input}
