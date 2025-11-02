@@ -1,5 +1,9 @@
 import { cn } from "@/lib/utils";
 import ReactMarkdown from "react-markdown";
+import { useState } from "react";
+import { IframeModal } from "./IframeModal";
+import { Button } from "./ui/button";
+import { ExternalLink } from "lucide-react";
 
 interface ChatMessageProps {
   role: 'user' | 'assistant' | 'system';
@@ -9,51 +13,86 @@ interface ChatMessageProps {
 
 export const ChatMessage = ({ role, content, timestamp }: ChatMessageProps) => {
   const isUser = role === 'user';
+  const [modalUrl, setModalUrl] = useState<string | null>(null);
+  
+  // Detectar patrón [MODAL:url] en el contenido
+  const modalMatch = content.match(/\[MODAL:(https?:\/\/[^\]]+)\]/);
+  const displayContent = modalMatch ? content.replace(/\[MODAL:https?:\/\/[^\]]+\]/, '') : content;
+  
+  const handleOpenModal = () => {
+    if (modalMatch) {
+      setModalUrl(modalMatch[1]);
+    }
+  };
   
   return (
-    <div className={cn(
-      "flex w-full mb-3 sm:mb-4 animate-in fade-in slide-in-from-bottom-4 duration-500",
-      isUser ? "justify-end" : "justify-start"
-    )}>
+    <>
       <div className={cn(
-        "max-w-[85%] sm:max-w-[80%] rounded-2xl px-3 py-2 sm:px-4 sm:py-3 shadow-md transition-all duration-300 break-words",
-        isUser 
-          ? "bg-gradient-to-br from-primary to-primary-glow text-primary-foreground ml-2 sm:ml-4" 
-          : "bg-card text-card-foreground border border-border mr-2 sm:mr-4"
+        "flex w-full mb-3 sm:mb-4 animate-in fade-in slide-in-from-bottom-4 duration-500",
+        isUser ? "justify-end" : "justify-start"
       )}>
-        <div className="text-xs sm:text-sm leading-relaxed prose prose-sm max-w-none dark:prose-invert [&>*]:break-words [&_a]:break-all">
-          <ReactMarkdown
-            components={{
-              p: ({ children }) => <p className="mb-1 sm:mb-2 last:mb-0">{children}</p>,
-              strong: ({ children }) => <strong className="font-bold">{children}</strong>,
-              em: ({ children }) => <em className="italic">{children}</em>,
-              a: ({ href, children }) => (
-                <a 
-                  href={href} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2.5 my-2 bg-gradient-to-r from-primary to-primary-glow text-white rounded-lg font-semibold hover:shadow-lg hover:scale-105 transition-all duration-300 no-underline break-normal"
-                >
-                  {children}
-                </a>
-              ),
-              ul: ({ children }) => <ul className="list-disc ml-3 sm:ml-4 mb-1 sm:mb-2">{children}</ul>,
-              ol: ({ children }) => <ol className="list-decimal ml-3 sm:ml-4 mb-1 sm:mb-2">{children}</ol>,
-              li: ({ children }) => <li className="mb-0.5 sm:mb-1">{children}</li>,
-            }}
-          >
-            {content}
-          </ReactMarkdown>
+        <div className={cn(
+          "max-w-[85%] sm:max-w-[80%] rounded-2xl px-3 py-2 sm:px-4 sm:py-3 shadow-elegant transition-all duration-300 break-words hover:shadow-lg",
+          isUser 
+            ? "bg-gradient-to-br from-primary to-primary-glow text-primary-foreground ml-2 sm:ml-4" 
+            : "bg-gradient-to-br from-card to-card/95 text-card-foreground border border-border/50 mr-2 sm:mr-4"
+        )}>
+          <div className="text-xs sm:text-sm leading-relaxed prose prose-sm max-w-none dark:prose-invert [&>*]:break-words">
+            <ReactMarkdown
+              components={{
+                p: ({ children }) => <p className="mb-1 sm:mb-2 last:mb-0">{children}</p>,
+                strong: ({ children }) => <strong className="font-bold">{children}</strong>,
+                em: ({ children }) => <em className="italic">{children}</em>,
+                a: ({ href, children }) => (
+                  <a 
+                    href={href} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-primary hover:underline break-all inline-flex items-center gap-1"
+                  >
+                    {children}
+                    <ExternalLink className="h-3 w-3" />
+                  </a>
+                ),
+                ul: ({ children }) => <ul className="list-disc ml-3 sm:ml-4 mb-1 sm:mb-2">{children}</ul>,
+                ol: ({ children }) => <ol className="list-decimal ml-3 sm:ml-4 mb-1 sm:mb-2">{children}</ol>,
+                li: ({ children }) => <li className="mb-0.5 sm:mb-1">{children}</li>,
+              }}
+            >
+              {displayContent}
+            </ReactMarkdown>
+          </div>
+          
+          {modalMatch && (
+            <Button
+              onClick={handleOpenModal}
+              className="mt-2 sm:mt-3 w-full bg-gradient-to-r from-primary to-secondary hover:shadow-elegant hover:scale-[1.02] transition-all duration-300"
+              size="sm"
+            >
+              <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
+              Abrir Servicio
+            </Button>
+          )}
+          
+          {timestamp && (
+            <p className={cn(
+              "text-[10px] sm:text-xs mt-1 sm:mt-1.5 opacity-70",
+              isUser ? "text-right" : "text-left"
+            )}>
+              {timestamp.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' })}
+            </p>
+          )}
         </div>
-        {timestamp && (
-          <p className={cn(
-            "text-[10px] sm:text-xs mt-1 sm:mt-1.5 opacity-70",
-            isUser ? "text-right" : "text-left"
-          )}>
-            {timestamp.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' })}
-          </p>
-        )}
       </div>
-    </div>
+      
+      {modalUrl && (
+        <IframeModal
+          isOpen={!!modalUrl}
+          onClose={() => setModalUrl(null)}
+          url={modalUrl}
+          title="Servicio Municipal"
+        />
+      )}
+    </>
   );
 };

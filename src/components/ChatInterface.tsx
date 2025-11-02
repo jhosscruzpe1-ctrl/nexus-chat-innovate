@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { ChatMessage } from "./ChatMessage";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import { Send, Loader2 } from "lucide-react";
+import { Send, Loader2, Facebook, Youtube, Twitter } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface Message {
@@ -174,9 +174,14 @@ Estoy aquí para ayudarte con:
             />
           ))}
           {isLoading && (
-            <div className="flex items-center justify-start">
-              <div className="bg-card rounded-2xl px-3 py-2 sm:px-4 sm:py-3 shadow-md border border-border">
-                <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 animate-spin text-muted-foreground" />
+            <div className="flex items-center justify-start mb-4 animate-in fade-in duration-300">
+              <div className="bg-gradient-to-br from-card to-card/95 rounded-2xl px-3 py-2 sm:px-4 sm:py-3 shadow-elegant border border-border/50 flex items-center gap-2">
+                <div className="flex gap-1">
+                  <span className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                  <span className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                  <span className="w-2 h-2 bg-primary rounded-full animate-bounce"></span>
+                </div>
+                <span className="text-xs text-muted-foreground">Escribiendo...</span>
               </div>
             </div>
           )}
@@ -209,6 +214,50 @@ Estoy aquí para ayudarte con:
         <p className="text-[10px] sm:text-xs text-muted-foreground mt-1 sm:mt-2 text-center hidden sm:block">
           Presiona Enter para enviar
         </p>
+      </div>
+
+      {/* Footer */}
+      <div className="bg-gradient-to-r from-muted/50 to-muted/30 border-t border-border px-3 py-2 sm:px-4 sm:py-3">
+        <div className="flex flex-col items-center gap-2 sm:gap-3">
+          {/* Redes Sociales */}
+          <div className="flex items-center gap-3 sm:gap-4">
+            <a
+              href="https://www.facebook.com/munichulucanas"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-muted-foreground hover:text-primary transition-colors duration-300 hover:scale-110"
+              aria-label="Facebook"
+            >
+              <Facebook className="h-4 w-4 sm:h-5 sm:w-5" />
+            </a>
+            <a
+              href="https://www.youtube.com/@munichulucanas"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-muted-foreground hover:text-primary transition-colors duration-300 hover:scale-110"
+              aria-label="YouTube"
+            >
+              <Youtube className="h-4 w-4 sm:h-5 sm:w-5" />
+            </a>
+            <a
+              href="https://twitter.com/munichulucanas"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-muted-foreground hover:text-primary transition-colors duration-300 hover:scale-110"
+              aria-label="Twitter"
+            >
+              <Twitter className="h-4 w-4 sm:h-5 sm:w-5" />
+            </a>
+          </div>
+          
+          {/* Derechos */}
+          <p className="text-[10px] sm:text-xs text-muted-foreground text-center leading-relaxed px-2">
+            © {new Date().getFullYear()} Todos los derechos reservados
+            <span className="hidden sm:inline"><br /></span>
+            <span className="sm:hidden"> - </span>
+            Municipalidad Provincial de Morropón - Chulucanas
+          </p>
+        </div>
       </div>
     </div>
   );
