@@ -32,7 +32,7 @@ export const ChatMessage = ({ role, content, timestamp }: ChatMessageProps) => {
                   href={href} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-primary hover:underline break-all"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 my-2 bg-gradient-to-r from-primary to-primary-glow text-white rounded-lg font-semibold hover:shadow-lg hover:scale-105 transition-all duration-300 no-underline break-normal"
                 >
                   {children}
                 </a>

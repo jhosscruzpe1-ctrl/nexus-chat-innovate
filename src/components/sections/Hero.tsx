@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
-import logoMuni from "@/assets/logo-municipalidad.png";
 import bgImage from "@/assets/municipalidad-building.png";
 
 export const Hero = () => {
@@ -20,17 +19,8 @@ export const Hero = () => {
       
       <div className="container mx-auto px-4 py-20 relative z-10">
         <div className="max-w-4xl mx-auto text-center space-y-8">
-          {/* Logo */}
-          <div className="flex justify-center mb-8 animate-in fade-in slide-in-from-top duration-700">
-            <img 
-              src={logoMuni} 
-              alt="Logo Municipalidad" 
-              className="h-32 w-32 object-contain drop-shadow-2xl"
-            />
-          </div>
-
           {/* Title */}
-          <h1 className="text-5xl md:text-6xl font-bold text-white animate-in fade-in slide-in-from-bottom duration-700 delay-100">
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white animate-in fade-in slide-in-from-bottom duration-700 pt-8">
             Municipalidad Provincial de
             <span className="block text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary mt-2">
               Morropón - Chulucanas
