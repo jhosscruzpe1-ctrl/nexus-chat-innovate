@@ -25,20 +25,35 @@ export const ChatInterface = ({ userId, userName = "Usuario", isMaximized = fals
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
+  const [isUserScrolling, setIsUserScrolling] = useState(false);
   const { toast } = useToast();
   const scrollRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     initializeConversation();
   }, [userId]);
 
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+    if (!isUserScrolling) {
+      scrollToBottom();
+    }
+  }, [messages, isUserScrolling]);
 
   const scrollToBottom = () => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({
+        top: scrollContainerRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  const handleScroll = () => {
+    if (scrollContainerRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = scrollContainerRef.current;
+      const isAtBottom = Math.abs(scrollHeight - clientHeight - scrollTop) < 50;
+      setIsUserScrolling(!isAtBottom);
     }
   };
 
@@ -174,7 +189,7 @@ Estoy aquí para ayudarte con:
             onClick={onToggleMaximize}
             variant="ghost"
             size="icon"
-            className="absolute top-3 right-12 sm:top-4 sm:right-14 hover:bg-white/10 h-8 w-8 sm:h-10 sm:w-10 text-primary-foreground"
+            className="absolute top-3 right-12 sm:top-4 sm:right-14 hover:bg-white/20 h-8 w-8 sm:h-10 sm:w-10 text-primary-foreground transition-all duration-300 rounded-full shadow-md hover:shadow-lg hover:scale-110"
           >
             {isMaximized ? (
               <Minimize2 className="h-4 w-4 sm:h-5 sm:w-5" />
@@ -186,7 +201,11 @@ Estoy aquí para ayudarte con:
       </div>
 
       {/* Messages */}
-      <ScrollArea className="flex-1 p-3 sm:p-4" ref={scrollRef}>
+      <div 
+        ref={scrollContainerRef}
+        onScroll={handleScroll}
+        className="flex-1 p-3 sm:p-4 overflow-y-auto"
+      >
         <div className="space-y-3 sm:space-y-4">
           {messages.map((message, index) => (
             <ChatMessage
@@ -209,7 +228,7 @@ Estoy aquí para ayudarte con:
             </div>
           )}
         </div>
-      </ScrollArea>
+      </div>
 
       {/* Input */}
       <div className="p-3 sm:p-4 bg-background/80 backdrop-blur-sm border-t border-border">

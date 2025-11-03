@@ -1,6 +1,8 @@
 import { cn } from "@/lib/utils";
 import ReactMarkdown from "react-markdown";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, AlertCircle } from "lucide-react";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
 interface ChatMessageProps {
   role: 'user' | 'assistant' | 'system';
@@ -10,6 +12,7 @@ interface ChatMessageProps {
 
 export const ChatMessage = ({ role, content, timestamp }: ChatMessageProps) => {
   const isUser = role === 'user';
+  const [iframeError, setIframeError] = useState(false);
   
   // Detectar patrón [MODAL:url] en el contenido
   const modalMatch = content.match(/\[MODAL:(https?:\/\/[^\]]+)\]/);
@@ -54,14 +57,33 @@ export const ChatMessage = ({ role, content, timestamp }: ChatMessageProps) => {
           </div>
           
           {modalMatch && (
-            <div className="mt-3 sm:mt-4 rounded-lg overflow-hidden border border-border/50">
-              <iframe
-                src={modalMatch[1]}
-                className="w-full h-[300px] sm:h-[400px] border-0"
-                title="Servicio Municipal"
-                sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox"
-                loading="lazy"
-              />
+            <div className="mt-3 sm:mt-4 rounded-lg overflow-hidden border border-border/50 bg-muted/30">
+              {iframeError ? (
+                <div className="p-4 sm:p-6 text-center space-y-3">
+                  <AlertCircle className="h-8 w-8 sm:h-10 sm:w-10 mx-auto text-muted-foreground" />
+                  <p className="text-xs sm:text-sm text-muted-foreground">
+                    Este servicio no puede mostrarse aquí por restricciones de seguridad.
+                  </p>
+                  <Button
+                    onClick={() => window.open(modalMatch[1], '_blank', 'noopener,noreferrer')}
+                    variant="outline"
+                    size="sm"
+                    className="gap-2"
+                  >
+                    Abrir en nueva pestaña
+                    <ExternalLink className="h-3 w-3" />
+                  </Button>
+                </div>
+              ) : (
+                <iframe
+                  src={modalMatch[1]}
+                  className="w-full h-[300px] sm:h-[400px] border-0"
+                  title="Servicio Municipal"
+                  sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox"
+                  loading="lazy"
+                  onError={() => setIframeError(true)}
+                />
+              )}
             </div>
           )}
           

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { MessageCircle, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ChatInterface } from "./ChatInterface";
@@ -7,6 +7,14 @@ import { cn } from "@/lib/utils";
 export const ChatWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMaximized, setIsMaximized] = useState(false);
+  const [conversationKey, setConversationKey] = useState(0);
+  
+  const handleClose = () => {
+    setIsOpen(false);
+    setIsMaximized(false);
+    // Resetear conversación al cerrar
+    setConversationKey(prev => prev + 1);
+  };
 
   return (
     <>
@@ -42,16 +50,17 @@ export const ChatWidget = () => {
           <div className="relative h-full bg-background border-2 border-primary/20">
             {/* Close Button */}
             <Button
-              onClick={() => setIsOpen(false)}
+              onClick={handleClose}
               variant="ghost"
               size="icon"
-              className="absolute top-3 right-3 sm:top-4 sm:right-4 z-10 hover:bg-destructive/20 hover:text-destructive h-8 w-8 sm:h-10 sm:w-10 transition-colors duration-200"
+              className="absolute top-3 right-3 sm:top-4 sm:right-4 z-10 hover:bg-destructive/20 hover:text-destructive h-8 w-8 sm:h-10 sm:w-10 transition-all duration-300 rounded-full shadow-md hover:shadow-lg hover:scale-110"
             >
               <X className="h-4 w-4 sm:h-5 sm:w-5" />
             </Button>
 
             {/* Chat Interface */}
             <ChatInterface 
+              key={conversationKey}
               isMaximized={isMaximized}
               onToggleMaximize={() => setIsMaximized(!isMaximized)}
             />
