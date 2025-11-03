@@ -59,6 +59,20 @@ async function findIntent(message: string, supabase: any) {
   console.log('Tokens:', tokens);
   console.log('Lemmas:', lemmas);
   
+  // Filtrar palabras de relleno comunes que no indican intención
+  const fillerWords = ['quiero', 'como', 'donde', 'cuando', 'puedo', 'ver', 'hola', 'gracias', 'bien', 'mal'];
+  const meaningfulTokens = tokens.filter(token => !fillerWords.includes(token));
+  const meaningfulLemmas = lemmas.filter(lemma => !fillerWords.includes(lemma));
+  
+  console.log('Meaningful tokens:', meaningfulTokens);
+  console.log('Meaningful lemmas:', meaningfulLemmas);
+  
+  // Si no hay tokens significativos, no buscar intenciones
+  if (meaningfulTokens.length === 0) {
+    console.log('No meaningful tokens, using AI');
+    return null;
+  }
+  
   // Obtener todas las intenciones
   const { data: intenciones, error } = await supabase
     .from('intenciones')
@@ -77,18 +91,43 @@ async function findIntent(message: string, supabase: any) {
     let score = 0;
     const keywords = intencion.keywords || [];
     
-    // Comparar con keywords
+    // Comparar con keywords - buscar coincidencias de frases completas
     for (const keyword of keywords) {
+      const keywordLower = keyword.toLowerCase();
+      const messageLower = message.toLowerCase();
+      
+      // Bonus por coincidencia exacta de frase
+      if (messageLower.includes(keywordLower) || keywordLower.includes(messageLower)) {
+        score += 5;
+        console.log(`Exact phrase match: "${keyword}" - Score +5`);
+      }
+      
       const keywordTokens = tokenize(keyword);
       const keywordLemmas = keywordTokens.map(lemmatize);
       
-      for (const lemma of lemmas) {
+      // Contar cuántos tokens del keyword están en el mensaje
+      let matchedTokens = 0;
+      for (const keywordToken of keywordTokens) {
+        if (meaningfulTokens.includes(keywordToken)) {
+          matchedTokens++;
+        }
+      }
+      
+      // Si coinciden múltiples tokens del keyword, dar puntos bonus
+      if (matchedTokens > 1) {
+        score += matchedTokens * 2;
+        console.log(`Multiple token match for "${keyword}": ${matchedTokens} tokens - Score +${matchedTokens * 2}`);
+      }
+      
+      // Comparación con lemmas
+      for (const lemma of meaningfulLemmas) {
         if (keywordLemmas.includes(lemma)) {
           score += 2;
         }
       }
       
-      for (const token of tokens) {
+      // Comparación con tokens
+      for (const token of meaningfulTokens) {
         if (keywordTokens.includes(token)) {
           score += 1;
         }
@@ -101,13 +140,14 @@ async function findIntent(message: string, supabase: any) {
     }
   }
   
-  console.log('Best match:', bestMatch, 'Score:', bestScore);
+  console.log('Best match:', bestMatch?.intent, 'Score:', bestScore);
   
-  // Umbral mínimo de confianza
-  if (bestScore >= 2) {
+  // Umbral mínimo de confianza aumentado para evitar falsos positivos
+  if (bestScore >= 4) {
     return bestMatch;
   }
   
+  console.log('Score too low, using AI');
   return null;
 }
 

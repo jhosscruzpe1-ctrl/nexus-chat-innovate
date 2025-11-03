@@ -21,14 +21,14 @@ export const ChatMessage = ({ role, content, timestamp }: ChatMessageProps) => {
   return (
     <>
       <div className={cn(
-        "flex w-full mb-3 sm:mb-4 animate-in fade-in slide-in-from-bottom-4 duration-500",
+        "flex w-full mb-3 sm:mb-4 animate-in slide-in-from-bottom-4 duration-500",
         isUser ? "justify-end" : "justify-start"
       )}>
         <div className={cn(
           "max-w-[85%] sm:max-w-[80%] rounded-2xl px-3 py-2 sm:px-4 sm:py-3 shadow-elegant transition-all duration-300 break-words hover:shadow-lg",
           isUser 
-            ? "bg-gradient-to-br from-primary to-primary-glow text-primary-foreground ml-2 sm:ml-4" 
-            : "bg-gradient-to-br from-card to-card/95 text-card-foreground border border-border/50 mr-2 sm:mr-4"
+            ? "bg-primary text-white ml-2 sm:ml-4" 
+            : "bg-card text-card-foreground border border-border/50 mr-2 sm:mr-4"
         )}>
           <div className="text-xs sm:text-sm leading-relaxed prose prose-sm max-w-none dark:prose-invert [&>*]:break-words">
             <ReactMarkdown
