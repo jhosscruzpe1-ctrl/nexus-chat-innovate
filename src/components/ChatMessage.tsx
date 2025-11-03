@@ -1,8 +1,5 @@
 import { cn } from "@/lib/utils";
 import ReactMarkdown from "react-markdown";
-import { useState } from "react";
-import { IframeModal } from "./IframeModal";
-import { Button } from "./ui/button";
 import { ExternalLink } from "lucide-react";
 
 interface ChatMessageProps {
@@ -13,17 +10,10 @@ interface ChatMessageProps {
 
 export const ChatMessage = ({ role, content, timestamp }: ChatMessageProps) => {
   const isUser = role === 'user';
-  const [modalUrl, setModalUrl] = useState<string | null>(null);
   
   // Detectar patrón [MODAL:url] en el contenido
   const modalMatch = content.match(/\[MODAL:(https?:\/\/[^\]]+)\]/);
   const displayContent = modalMatch ? content.replace(/\[MODAL:https?:\/\/[^\]]+\]/, '') : content;
-  
-  const handleOpenModal = () => {
-    if (modalMatch) {
-      setModalUrl(modalMatch[1]);
-    }
-  };
   
   return (
     <>
@@ -64,14 +54,15 @@ export const ChatMessage = ({ role, content, timestamp }: ChatMessageProps) => {
           </div>
           
           {modalMatch && (
-            <Button
-              onClick={handleOpenModal}
-              className="mt-2 sm:mt-3 w-full bg-gradient-to-r from-primary to-secondary hover:shadow-elegant hover:scale-[1.02] transition-all duration-300"
-              size="sm"
-            >
-              <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
-              Abrir Servicio
-            </Button>
+            <div className="mt-3 sm:mt-4 rounded-lg overflow-hidden border border-border/50">
+              <iframe
+                src={modalMatch[1]}
+                className="w-full h-[300px] sm:h-[400px] border-0"
+                title="Servicio Municipal"
+                sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox"
+                loading="lazy"
+              />
+            </div>
           )}
           
           {timestamp && (
@@ -84,15 +75,6 @@ export const ChatMessage = ({ role, content, timestamp }: ChatMessageProps) => {
           )}
         </div>
       </div>
-      
-      {modalUrl && (
-        <IframeModal
-          isOpen={!!modalUrl}
-          onClose={() => setModalUrl(null)}
-          url={modalUrl}
-          title="Servicio Municipal"
-        />
-      )}
     </>
   );
 };

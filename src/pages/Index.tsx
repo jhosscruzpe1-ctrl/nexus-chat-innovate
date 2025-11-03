@@ -3,6 +3,7 @@ import { Hero } from "@/components/sections/Hero";
 import { About } from "@/components/sections/About";
 import { Services } from "@/components/sections/Services";
 import { Contact } from "@/components/sections/Contact";
+import { Footer } from "@/components/sections/Footer";
 import { ChatWidget } from "@/components/ChatWidget";
 
 const Index = () => {
@@ -13,6 +14,7 @@ const Index = () => {
       <About />
       <Services />
       <Contact />
+      <Footer />
       <ChatWidget />
     </div>
   );
